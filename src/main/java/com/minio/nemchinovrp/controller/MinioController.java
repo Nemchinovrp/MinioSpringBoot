@@ -1,7 +1,6 @@
 package com.minio.nemchinovrp.controller;
 
 import com.jlefebure.spring.boot.minio.MinioService;
-import io.minio.errors.MinioException;
 import io.minio.messages.Item;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
-
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -28,9 +27,9 @@ public class MinioController {
         return minioService.list();
     }
 
-/*    @GetMapping("/{object}")
-    public void getObject(@PathVariable("object") String object, HttpServletResponse response) throws MinioException, IOException {
-        InputStream inputStream = minioService.get(Path.of(object));
+    @GetMapping("/{object}")
+    public void getObject(@PathVariable("object") String object, HttpServletResponse response) throws com.jlefebure.spring.boot.minio.MinioException, IOException {
+        InputStream inputStream = minioService.get(Paths.get(object));
         InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
 
         // Set the content type and attachment header.
@@ -43,14 +42,14 @@ public class MinioController {
     }
 
     @PostMapping
-    public void addAttachement(@RequestParam("file") MultipartFile file) {
-        Path path = Path.of(file.getOriginalFilename());
+    public void addAttachement(@RequestParam("file") MultipartFile file) throws IOException {
+        Path path = Paths.get(file.getResource().getURI());
         try {
             minioService.upload(path, file.getInputStream(), file.getContentType());
-        } catch (MinioException e) {
+        } catch (com.jlefebure.spring.boot.minio.MinioException e) {
             throw new IllegalStateException("The file cannot be upload on the internal storage. Please retry later", e);
-        } catch (IOException | com.jlefebure.spring.boot.minio.MinioException e) {
+        } catch (IOException e) {
             throw new IllegalStateException("The file cannot be read", e);
         }
-    }*/
+    }
 }
